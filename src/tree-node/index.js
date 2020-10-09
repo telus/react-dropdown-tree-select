@@ -65,6 +65,7 @@ class TreeNode extends PureComponent {
     searchModeOn: PropTypes.bool,
     onNodeToggle: PropTypes.func,
     onAction: PropTypes.func,
+    actionRenderer: PropTypes.func,
     onCheckboxChange: PropTypes.func,
     mode: PropTypes.oneOf(['multiSelect', 'simpleSelect', 'radioSelect', 'hierarchical']),
     showPartiallySelected: PropTypes.bool,
@@ -103,6 +104,7 @@ class TreeNode extends PureComponent {
       value,
       disabled,
       actions,
+      actionRenderer,
       onAction,
       searchModeOn,
       onNodeToggle,
@@ -133,7 +135,7 @@ class TreeNode extends PureComponent {
           readOnly={readOnly}
           clientId={clientId}
         />
-        <Actions actions={actions} onAction={onAction} id={_id} readOnly={readOnly} />
+        <Actions actions={actions} actionRenderer={actionRenderer} onAction={onAction} id={_id} readOnly={readOnly} />
       </li>
     )
   }

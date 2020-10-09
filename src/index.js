@@ -37,6 +37,7 @@ class DropdownTreeSelect extends Component {
     className: PropTypes.string,
     onChange: PropTypes.func,
     onAction: PropTypes.func,
+    actionRenderer: PropTypes.func,
     onNodeToggle: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -331,6 +332,7 @@ class DropdownTreeSelect extends Component {
                   keepChildrenOnSearch={this.props.keepChildrenOnSearch}
                   searchModeOn={this.state.searchModeOn}
                   onAction={this.onAction}
+                  actionRenderer={this.props.actionRenderer}
                   onCheckboxChange={this.onCheckboxChange}
                   onNodeToggle={this.onNodeToggle}
                   mode={mode}
