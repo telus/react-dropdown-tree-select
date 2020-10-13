@@ -29,6 +29,7 @@ class DropdownTreeSelect extends Component {
     keepOpenOnSelect: PropTypes.bool,
     texts: PropTypes.shape({
       placeholder: PropTypes.string,
+      inlineSearchPlaceholder: PropTypes.string,
       noMatches: PropTypes.string,
       label: PropTypes.string,
       labelRemove: PropTypes.string,
@@ -51,6 +52,7 @@ class DropdownTreeSelect extends Component {
   }
 
   static defaultProps = {
+    onAction: () => {},
     onFocus: () => {},
     onBlur: () => {},
     onChange: () => {},
@@ -76,21 +78,21 @@ class DropdownTreeSelect extends Component {
       rootPrefixId: this.clientId,
       searchPredicate,
     })
-    // Restore focus-state
-    const currentFocusNode = this.state.currentFocus && this.treeManager.getNodeById(this.state.currentFocus)
-    if (currentFocusNode) {
-      currentFocusNode._focused = true
-    }
-    this.setState(prevState => ({
-      showDropdown: /initial|always/.test(showDropdown) || prevState.showDropdown === true,
-      ...this.treeManager.getTreeAndTags(),
-    }))
+    this.setState(prevState => {
+      const currentFocusNode = prevState.currentFocus && this.treeManager.getNodeById(prevState.currentFocus)
+      if (currentFocusNode) {
+        currentFocusNode._focused = true
+      }
+      return {
+        showDropdown: /initial|always/.test(showDropdown) || prevState.showDropdown === true,
+        ...this.treeManager.getTreeAndTags(),
+      }
+    })
   }
 
   resetSearchState = () => {
     // clear the search criteria and avoid react controlled/uncontrolled warning
-    // !this.props.inlineSearchInput is gated as inline search is not rendered until dropdown is shown
-    if (!this.props.inlineSearchInput) {
+    if (this.searchInput) {
       this.searchInput.value = ''
     }
 
@@ -174,25 +176,29 @@ class DropdownTreeSelect extends Component {
   }
 
   onCheckboxChange = (id, checked, callback) => {
-    const { mode, keepOpenOnSelect } = this.props
+    const { mode, keepOpenOnSelect, clearSearchOnChange } = this.props
+    const { currentFocus, searchModeOn } = this.state
     this.treeManager.setNodeCheckedState(id, checked)
     let tags = this.treeManager.tags
     const isSingleSelect = ['simpleSelect', 'radioSelect'].indexOf(mode) > -1
     const showDropdown = isSingleSelect && !keepOpenOnSelect ? false : this.state.showDropdown
+    const currentFocusNode = currentFocus && this.treeManager.getNodeById(currentFocus)
+    const node = this.treeManager.getNodeById(id)
 
     if (!tags.length) {
       this.treeManager.restoreDefaultValues()
       tags = this.treeManager.tags
     }
 
-    const tree = this.state.searchModeOn ? this.treeManager.matchTree : this.treeManager.tree
+    const tree = searchModeOn ? this.treeManager.matchTree : this.treeManager.tree
     const nextState = {
       tree,
       tags,
       showDropdown,
+      currentFocus: id,
     }
 
-    if ((isSingleSelect && !showDropdown) || this.props.clearSearchOnChange) {
+    if ((isSingleSelect && !showDropdown) || clearSearchOnChange) {
       Object.assign(nextState, this.resetSearchState())
     }
 
@@ -200,10 +206,11 @@ class DropdownTreeSelect extends Component {
       document.removeEventListener('click', this.handleOutsideClick, false)
     }
 
+    keyboardNavigation.adjustFocusedProps(currentFocusNode, node)
     this.setState(nextState, () => {
       callback && callback(tags)
     })
-    this.props.onChange(this.treeManager.getNodeById(id), tags)
+    this.props.onChange(node, tags)
   }
 
   onAction = (nodeId, action) => {
@@ -249,7 +256,10 @@ class DropdownTreeSelect extends Component {
         this.onNodeToggle
       )
       if (newFocus !== currentFocus) {
-        this.setState({ currentFocus: newFocus })
+        this.setState({ currentFocus: newFocus }, () => {
+          const ele = document && document.getElementById(`${newFocus}_li`)
+          ele && ele.scrollIntoView()
+        })
       }
     } else if (showDropdown && ['Escape', 'Tab'].indexOf(e.key) > -1) {
       if (mode === 'simpleSelect' && tree.has(currentFocus)) {
@@ -298,6 +308,7 @@ class DropdownTreeSelect extends Component {
         onBlur={this.onInputBlur}
         onKeyDown={this.onKeyboardKeyDown}
         {...commonProps}
+        inlineSearchInput={inlineSearchInput}
       />
     )
     return (
