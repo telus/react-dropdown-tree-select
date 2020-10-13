@@ -1,5 +1,5 @@
 {
-  "name": "@crzech/telus-react-dropdown-tree-select",
+  "name": "@telus/telus-react-dropdown-tree-select",
   "version": "1.0.0",
   "description": "Lightweight, customizable and fast Dropdown Tree Select component for React",
   "keywords": [
