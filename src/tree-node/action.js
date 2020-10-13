@@ -8,11 +8,19 @@ class Action extends PureComponent {
     className: PropTypes.string,
     actionData: PropTypes.object,
     onAction: PropTypes.func,
+    actionRenderer: PropTypes.func,
     readOnly: PropTypes.bool,
   }
 
   static defaultProps = {
     onAction: () => {},
+    actionRenderer: (title, className, text, readOnly, handleClick) => {
+      return (
+        <i title={title} className={className} onClick={!readOnly ? handleClick : undefined}>
+          {text}
+        </i>
+      )
+    },
   }
 
   handleClick = () => {
@@ -23,13 +31,8 @@ class Action extends PureComponent {
   }
 
   render() {
-    const { title, className, text, readOnly } = this.props
-
-    return (
-      <i title={title} className={className} onClick={!readOnly ? this.handleClick : undefined}>
-        {text}
-      </i>
-    )
+    const { title, className, text, readOnly, actionRenderer } = this.props
+    return <div className="action-wrapper">{actionRenderer(title, className, text, readOnly)}</div>
   }
 }
 

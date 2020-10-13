@@ -8,6 +8,7 @@ class Actions extends PureComponent {
   static propTypes = {
     id: PropTypes.string.isRequired,
     actions: PropTypes.array,
+    actionRenderer: PropTypes.func,
   }
 
   render() {

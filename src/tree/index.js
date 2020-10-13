@@ -23,6 +23,7 @@ class Tree extends Component {
     onChange: PropTypes.func,
     onNodeToggle: PropTypes.func,
     onAction: PropTypes.func,
+    actionRenderer: PropTypes.func,
     onCheckboxChange: PropTypes.func,
     mode: PropTypes.oneOf(['multiSelect', 'simpleSelect', 'radioSelect', 'hierarchical']),
     showPartiallySelected: PropTypes.bool,
@@ -78,6 +79,7 @@ class Tree extends Component {
       showPartiallySelected,
       readOnly,
       onAction,
+      actionRenderer,
       onChange,
       onCheckboxChange,
       onNodeToggle,
@@ -98,6 +100,7 @@ class Tree extends Component {
             onCheckboxChange={onCheckboxChange}
             onNodeToggle={onNodeToggle}
             onAction={onAction}
+            actionRenderer={actionRenderer}
             mode={mode}
             showPartiallySelected={showPartiallySelected}
             readOnly={readOnly}
